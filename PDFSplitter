@@ -1,0 +1,151 @@
+package pDFsplit;
+
+import java.awt.BorderLayout;
+import java.awt.Button;
+import java.awt.Dimension;
+import java.awt.TextField;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+
+import javax.swing.JFileChooser;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
+
+import org.pdfclown.documents.Document;
+import org.pdfclown.documents.Pages;
+import org.pdfclown.files.File;
+import org.pdfclown.files.SerializationModeEnum;
+import org.pdfclown.tools.PageManager;
+
+public class Main {
+
+	/**
+	 * @param args
+	 * @throws IOException
+	 */
+	public static void main(String[] args) throws IOException {
+		// TODO Auto-generated method stub
+
+		System.out.println("Hi");
+
+		JFrame frame = new JFrame();
+		final JFileChooser fileSelector = new JFileChooser();
+		final JFileChooser newFileLocation = new JFileChooser();
+		final TextField firstPage = new TextField();
+		final TextField lastPage = new TextField();
+		final JLabel text = new JLabel(
+				""
+						+ "Click File ->Browse to find your PDF. Then Click the Split Button Below. Enter the number of the first page for splitting"
+						+ "4. Enter the final page to be included in the split file."
+						+ "5. Wait a few seconds."
+						+ "6. Go to your folder and open your file."
+
+		);
+
+		JMenuBar menuBar = new JMenuBar();
+		JMenu file = new JMenu("File");
+		JMenuItem Browse = new JMenuItem("Browse..");
+		Browse.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+
+				System.out.println("HO");
+
+				System.out.println("Hi");
+				fileSelector.showDialog(new JFrame(), "OK");
+				newFileLocation.showDialog(new JFrame(), "Save here..");
+
+			}
+		});
+		menuBar.add(file);
+		file.add(Browse);
+		frame.setJMenuBar(menuBar);
+
+		final Button button = new Button("Hi! "
+				+ "First select a File above. Then click here to split.");
+		button.setMinimumSize(new Dimension(200, 100));
+		frame.getContentPane().add(button, BorderLayout.CENTER);
+		Dimension d = new Dimension(400, 200);
+		frame.getContentPane().setSize(d);
+		frame.setMinimumSize(d);
+		frame.setVisible(true);
+		button.addMouseListener(new MouseListener() {
+
+			@Override
+			public void mouseClicked(MouseEvent arg0) {
+				// TODO Auto-generated method stub
+
+				java.io.File selectedFiles = fileSelector.getSelectedFile();
+
+				try {
+					String firstPage = JOptionPane
+							.showInputDialog("Please enter the First Page. \n This is the last page to exclude. \n So if you want to delete page 1 to 5 from a total of 10 pages, this would  be page 5");
+					String lastPage = JOptionPane
+							.showInputDialog("Please enter the Last Page. This is the last page to keep.");
+
+					final File file;
+					file = new File(selectedFiles.getPath());
+					Document document = file.getDocument();
+					final Pages mainPages = document.getPages();
+					final int mainPagesCount = mainPages.size();
+
+					System.out.println("Number of Pages: " + mainPagesCount);
+					PageManager pagemanager = new PageManager(document);
+					Document newDocument = pagemanager.extract(
+							Integer.parseInt(firstPage)-1,
+							Integer.parseInt(lastPage));
+
+					File file2 = newDocument.getFile();
+					try {
+						file2.save(newFileLocation.getSelectedFile().getPath()
+								+ selectedFiles.getName() + ".pdf",
+								SerializationModeEnum.Standard);
+					} catch (IOException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+
+				} catch (FileNotFoundException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+
+			}
+
+			@Override
+			public void mouseEntered(MouseEvent arg0) {
+				// TODO Auto-generated method stub
+
+			}
+
+			@Override
+			public void mouseExited(MouseEvent arg0) {
+				// TODO Auto-generated method stub
+
+			}
+
+			@Override
+			public void mousePressed(MouseEvent arg0) {
+				// TODO Auto-generated method stub
+
+			}
+
+			@Override
+			public void mouseReleased(MouseEvent arg0) {
+				// TODO Auto-generated method stub
+
+			}
+
+		});
+
+	}
+}
